@@ -106,7 +106,6 @@ ExportMode struct elem *trackFunction(const atElem *ElemData,struct elem *Elem,
         Elem->kappa_x_std = kappa_x_std;
         Elem->kappa_y_std = kappa_y_std;
         Elem->kappa_s_std = kappa_s_std;
-        Elem->U0 = U0;
         Elem->dispx = dispx;
         Elem->dispxp = dispxp;
         Elem->dispy = dispy;
@@ -116,12 +115,12 @@ ExportMode struct elem *trackFunction(const atElem *ElemData,struct elem *Elem,
     
     // Call YOUR function, not SimpleRadiationRadPass
     StochasticRadiationPass(r_in, 
-                           Elem->kappa_x_mean, Elem->kappa_y_mean, Elem->kappa_s_mean,
-                           Elem->kappa_x_std, Elem->kappa_y_std, Elem->kappa_s_std,
-                           Elem->dispx, Elem->dispxp, Elem->dispy, Elem->dispyp,
-                           Elem->EnergyLossFactor,
-                           &Param->rng, num_particles);
-    return Elem;
+                          Elem->kappa_x_mean, Elem->kappa_y_mean, Elem->kappa_s_mean,
+                          Elem->kappa_x_std, Elem->kappa_y_std, Elem->kappa_s_std,
+                          Elem->dispx, Elem->dispxp, Elem->dispy, Elem->dispyp,
+                          Elem->EnergyLossFactor,
+                          Param->thread_rng, num_particles);
+        return Elem;
 }
 
 MODULE_DEF(StochasticRadiationPass)        /* Change module name too */
@@ -167,11 +166,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
     // Call YOUR function
     StochasticRadiationPass(r_in, 
-                           kappa_x_mean, kappa_y_mean, kappa_s_mean,
-                           kappa_x_std, kappa_y_std, kappa_s_std,
-                           dispx, dispxp, dispy, dispyp,
-                           EnergyLossFactor,
-                           &rng, num_particles);
+                          kappa_x_mean, kappa_y_mean, kappa_s_mean,
+                          kappa_x_std, kappa_y_std, kappa_s_std,
+                          dispx, dispxp, dispy, dispyp,
+                          EnergyLossFactor,
+                          &pcg32_global, num_particles);  // ✅ Use &pcg32_global like QuantDiff
   }      
   else if (nrhs == 0) {
       /* list of required fields */
